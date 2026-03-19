@@ -6692,7 +6692,12 @@ impl<'db, 'ast> TypeInferenceBuilder<'db, 'ast> {
         let file_scope_id = self.scope().file_scope_id(db);
         let use_def = self.index.use_def_map(file_scope_id);
 
-        let keyword = argument.as_variadic()?;
+        let ArgOrKeyword::Keyword(keyword) = argument else {
+            return None;
+        };
+        if keyword.arg.is_some() {
+            return None;
+        }
 
         if !argument_type
             .as_nominal_instance()?
